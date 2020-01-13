@@ -34,8 +34,8 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
  */
 
 const TerserPlugin = require('terser-webpack-plugin');
-
 const workboxPlugin = require('workbox-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   mode: 'development',
@@ -54,6 +54,7 @@ module.exports = {
       clientsClaim: true,
       skipWaiting: false,
     }),
+    new HtmlWebpackPlugin(),
   ],
 
   module: {
@@ -88,6 +89,12 @@ module.exports = {
 
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
+  },
+
+  devServer: {
+    contentBase: path.join(__dirname, 'dist'),
+    compress: true,
+    port: 9000,
   },
 
   optimization: {
