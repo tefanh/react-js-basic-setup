@@ -36,6 +36,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const workboxPlugin = require('workbox-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 module.exports = {
   mode: 'development',
@@ -54,7 +55,12 @@ module.exports = {
       clientsClaim: true,
       skipWaiting: false,
     }),
-    new HtmlWebpackPlugin(),
+    new ForkTsCheckerWebpackPlugin({ eslint: true }),
+    new HtmlWebpackPlugin({
+      template: './src/main/index.html',
+      chunksSortMode: 'auto',
+      inject: 'body',
+    }),
   ],
 
   module: {
@@ -67,22 +73,39 @@ module.exports = {
       },
       {
         test: /.css$/,
-
         use: [
-          {
-            loader: MiniCssExtractPlugin.loader,
-          },
-          {
-            loader: 'style-loader',
-          },
+          { loader: MiniCssExtractPlugin.loader },
+          { loader: 'style-loader' },
           {
             loader: 'css-loader',
-
             options: {
               sourceMap: true,
             },
           },
         ],
+      },
+      {
+        test: /\.(png|jpe?g|gif|svg|woff2?|ttf|eot)$/i,
+        use: [
+          {
+            loader: 'file-loader',
+          },
+        ],
+      },
+      {
+        test: /\.html$/,
+        loader: 'html-loader',
+        options: {
+          minimize: true,
+          caseSensitive: true,
+        },
+        exclude: /(src\/main\/index.html)/,
+      },
+      {
+        test: /\.(j|t)sx?$/,
+        enforce: 'pre',
+        loader: 'eslint-loader',
+        exclude: /node_modules/,
       },
     ],
   },
